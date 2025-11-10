@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Anand's Wisdom">
+    <title>Anand's Monday Wisdom</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --highlight: #ffd700;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 20px 15px;
+            box-shadow: 0 2px 10px var(--shadow);
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Search and Filter */
+        .controls {
+            position: fixed;
+            top: 110px;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 2px 5px var(--shadow);
+            z-index: 99;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Content */
+        .content {
+            margin-top: 220px;
+            padding: 15px;
+        }
+
+        .post-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px var(--shadow);
+            position: relative;
+            transition: transform 0.2s;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-card.highlighted {
+            border-left: 4px solid var(--highlight);
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .post-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .highlight-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .highlight-btn:active {
+            transform: scale(0.9);
+        }
+
+        .post-content {
+            color: var(--text-primary);
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.95em;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .post-time {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+
+        .share-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px var(--shadow);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            padding: 5px 15px;
+            border: none;
+            background: none;
+            font-size: 0.75em;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.5em;
+        }
+
+        /* Year Header */
+        .year-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin: 20px 0 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .year-header h2 {
+            font-size: 1.4em;
+        }
+
+        .year-count {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .emoji {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Install Banner */
+        .install-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .install-banner.show {
+            display: flex;
+        }
+
+        .install-icon {
+            font-size: 2em;
+        }
+
+        .install-text {
+            flex: 1;
+        }
+
+        .install-text h3 {
+            font-size: 1em;
+            margin-bottom: 3px;
+        }
+
+        .install-text p {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .install-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Fab Button */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5em;
+            box-shadow: 0 4px 12px var(--shadow);
+            cursor: pointer;
+            z-index: 50;
+            transition: transform 0.3s;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        /* Month Label */
+        .month-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin: 25px 0 15px;
+            padding-left: 5px;
+        }
+
+        /* Badge */
+        .badge {
+            background: var(--highlight);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🌟 Anand's Monday Wisdom</h1>
+        <div class="subtitle">Weekly reflections from the heart</div>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span>📝</span>
+                <span id="totalPosts">0</span>
+            </div>
+            <div class="stat-item">
+                <span>⭐</span>
+                <span id="highlightedCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span>📅</span>
+                <span id="yearRange">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Banner -->
+    <div class="install-banner" id="installBanner">
+        <div class="install-icon">📱</div>
+        <div class="install-text">
+            <h3>Install App</h3>
+            <p>Add to home screen for quick access</p>
+        </div>
+        <button class="install-btn" id="installBtn">Install</button>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search wisdom...">
+        <div class="filter-chips" id="filterChips">
+            <div class="chip active" data-filter="all">All</div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Loading wisdom...</div>
+        </div>
+        <div id="postsContainer"></div>
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="emoji">🔍</div>
+            <h3>No posts found</h3>
+            <p>Try adjusting your filters or search</p>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab" title="Scroll to top">↑</button>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-item active" data-view="all" id="navAll">
+            <span class="nav-icon">📚</span>
+            <span>All Posts</span>
+        </button>
+        <button class="nav-item" data-view="highlighted" id="navHighlighted">
+            <span class="nav-icon">⭐</span>
+            <span>Favorites</span>
+        </button>
+        <button class="nav-item" data-view="years" id="navYears">
+            <span class="nav-icon">📅</span>
+            <span>By Year</span>
+        </button>
+        <button class="nav-item" data-view="random" id="navRandom">
+            <span class="nav-icon">🎲</span>
+            <span>Random</span>
+        </button>
+    </div>
+
+    <script>
+        let allPosts = [];
+        let highlightedPosts = new Set();
+        let currentView = 'all';
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let deferredPrompt;
+
+        // Load data on startup
+        window.addEventListener('load', init);
+
+        async function init() {
+            loadHighlights();
+            await loadPosts();
+            setupEventListeners();
+            checkInstallability();
+        }
+
+        // Load posts from JSON
+        async function loadPosts() {
+            try {
+                const response = await fetch('anand_posts.json');
+                allPosts = await response.json();
+
+                updateStats();
+                createFilterChips();
+                renderPosts();
+
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('loading').innerHTML =
+                    '<div class="empty-state"><div class="emoji">❌</div><h3>Error loading posts</h3></div>';
+            }
+        }
+
+        // Load highlighted posts from localStorage
+        function loadHighlights() {
+            const saved = localStorage.getItem('highlightedPosts');
+            if (saved) {
+                highlightedPosts = new Set(JSON.parse(saved));
+            }
+        }
+
+        // Save highlighted posts to localStorage
+        function saveHighlights() {
+            localStorage.setItem('highlightedPosts', JSON.stringify([...highlightedPosts]));
+        }
+
+        // Toggle highlight
+        function toggleHighlight(postId) {
+            if (highlightedPosts.has(postId)) {
+                highlightedPosts.delete(postId);
+            } else {
+                highlightedPosts.add(postId);
+
+                // Haptic feedback if available
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
+            saveHighlights();
+            updateStats();
+            renderPosts();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const years = [...new Set(allPosts.map(p => p.year))].sort();
+            document.getElementById('totalPosts').textContent = allPosts.length;
+            document.getElementById('highlightedCount').textContent = highlightedPosts.size;
+            document.getElementById('yearRange').textContent = years.length > 0 ?
+                `${years[0]}-${years[years.length - 1]}` : '-';
+        }
+
+        // Create filter chips
+        function createFilterChips() {
+            const years = [...new Set(allPosts.map(p => p.year))].sort().reverse();
+            const chipsContainer = document.getElementById('filterChips');
+
+            years.forEach(year => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.dataset.filter = year;
+                chip.textContent = year;
+                chip.onclick = () => setFilter(year);
+                chipsContainer.appendChild(chip);
+            });
+        }
+
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.filter == filter);
+            });
+            renderPosts();
+        }
+
+        // Filter posts
+        function filterPosts() {
+            let filtered = allPosts;
+
+            // Filter by view
+            if (currentView === 'highlighted') {
+                filtered = filtered.filter(p => highlightedPosts.has(getPostId(p)));
+            }
+
+            // Filter by year
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(p => p.year == currentFilter);
+            }
+
+            // Filter by search
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.text.toLowerCase().includes(query) ||
+                    p.date.includes(query)
+                );
+            }
+
+            return filtered;
+        }
+
+        // Get unique post ID
+        function getPostId(post) {
+            return `${post.date}_${post.time}`;
+        }
+
+        // Render posts
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            let filtered = filterPosts();
+
+            // Random view - show one random post
+            if (currentView === 'random') {
+                filtered = filtered.length > 0 ? [filtered[Math.floor(Math.random() * filtered.length)]] : [];
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Group by year and month
+            const grouped = {};
+            filtered.forEach(post => {
+                if (!grouped[post.year]) grouped[post.year] = {};
+                if (!grouped[post.year][post.month]) grouped[post.year][post.month] = [];
+                grouped[post.year][post.month].push(post);
+            });
+
+            let html = '';
+            const years = Object.keys(grouped).sort((a, b) => b - a);
+
+            years.forEach(year => {
+                const yearPosts = Object.values(grouped[year]).flat();
+
+                if (currentView !== 'random') {
+                    html += `
+                        <div class="year-header">
+                            <h2>${year}</h2>
+                            <span class="year-count">${yearPosts.length}</span>
+                        </div>
+                    `;
+                }
+
+                const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+
+                monthOrder.forEach(month => {
+                    if (grouped[year][month]) {
+                        if (currentView !== 'random') {
+                            html += `<div class="month-label">${month}</div>`;
+                        }
+
+                        grouped[year][month].forEach(post => {
+                            const postId = getPostId(post);
+                            const isHighlighted = highlightedPosts.has(postId);
+                            const text = post.text
+                                .replace(/<Media omitted>/g, '📷 [Media]')
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;');
+
+                            html += `
+                                <div class="post-card ${isHighlighted ? 'highlighted' : ''}" data-id="${postId}">
+                                    <div class="post-header">
+                                        <div class="post-date">
+                                            📅 ${post.date}
+                                            ${isHighlighted ? '<span class="badge">⭐</span>' : ''}
+                                        </div>
+                                        <button class="highlight-btn" onclick="toggleHighlight('${postId}')">
+                                            ${isHighlighted ? '⭐' : '☆'}
+                                        </button>
+                                    </div>
+                                    <div class="post-content">${text}</div>
+                                    <div class="post-footer">
+                                        <span class="post-time">${post.time}</span>
+                                        <button class="share-btn" onclick="sharePost('${postId}')">📤</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Share post
+        async function sharePost(postId) {
+            const post = allPosts.find(p => getPostId(p) === postId);
+            if (!post) return;
+
+            const shareData = {
+                title: `Anand's Monday Wisdom - ${post.date}`,
+                text: post.text.substring(0, 200) + (post.text.length > 200 ? '...' : ''),
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback: copy to clipboard
+                    await navigator.clipboard.writeText(`${shareData.title}\n\n${post.text}`);
+                    alert('Copied to clipboard!');
+                }
+            } catch (error) {
+                console.log('Share cancelled or failed');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderPosts();
+            });
+
+            // Bottom navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const view = item.dataset.view;
+                    setView(view);
+                });
+            });
+
+            // FAB - scroll to top
+            document.getElementById('fab').addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Show/hide FAB on scroll
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                document.getElementById('fab').style.display = currentScroll > 300 ? 'block' : 'none';
+            });
+        }
+
+        // Set view
+        function setView(view) {
+            currentView = view;
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.view === view);
+            });
+
+            renderPosts();
+        }
+
+        // Check if app can be installed
+        function checkInstallability() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('installBanner').classList.add('show');
+            });
+
+            document.getElementById('installBtn').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').classList.remove('show');
+                }
+            });
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('Service worker registration failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>
