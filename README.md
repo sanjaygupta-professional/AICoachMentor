@@ -1,4 +1,4 @@
-# Anand's Monday Reflections Timeline
+# Ananth's Monday Reflections Timeline
 
 A beautiful, interactive timeline showcasing Anand's weekly Monday posts from the Yayati Coaches WhatsApp group.
 
