@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anand's Monday Reflections - Timeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat .number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .year-section {
+            margin-bottom: 60px;
+        }
+
+        .year-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 10;
+        }
+
+        .year-header h2 {
+            color: #667eea;
+            font-size: 2em;
+            display: inline-block;
+        }
+
+        .year-count {
+            float: right;
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.3) 100%);
+            border-radius: 2px;
+        }
+
+        .month-group {
+            margin-bottom: 40px;
+        }
+
+        .month-label {
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            margin-left: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .post {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            margin-left: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .post:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .post::before {
+            content: '';
+            position: absolute;
+            left: -42px;
+            top: 25px;
+            width: 16px;
+            height: 16px;
+            background: #667eea;
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .post-date {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-date::before {
+            content: '📅';
+        }
+
+        .post-content {
+            color: #333;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .post-time {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .filter-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .year-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .year-filter {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .year-filter:hover {
+            background: #e0e0e0;
+        }
+
+        .year-filter.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .no-results {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .stats {
+                gap: 15px;
+            }
+
+            .stat {
+                padding: 10px 20px;
+            }
+
+            .year-header h2 {
+                font-size: 1.5em;
+            }
+
+            .year-count {
+                float: none;
+                display: inline-block;
+                margin-left: 10px;
+            }
+
+            .timeline {
+                padding-left: 20px;
+            }
+
+            .post {
+                margin-left: 15px;
+                padding: 20px;
+            }
+
+            .post::before {
+                left: -27px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 Anand's Monday Reflections 🌟</h1>
+            <p>A journey through weekly wisdom and life insights</p>
+            <div class="stats">
+                <div class="stat">
+                    <span class="number" id="totalPosts">0</span>
+                    <span class="label">Total Posts</span>
+                </div>
+                <div class="stat">
+                    <span class="number" id="totalYears">0</span>
+                    <span class="label">Years</span>
+                </div>
+                <div class="stat">
+                    <span class="number" id="firstYear">-</span>
+                    <span class="label">Started</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="filter-section">
+            <h3>Filter by Year</h3>
+            <div class="year-filters" id="yearFilters">
+                <div class="year-filter active" data-year="all">All Years</div>
+            </div>
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search posts...">
+        </div>
+
+        <div id="timeline"></div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            No posts found matching your search criteria.
+        </div>
+
+        <footer>
+            <p>💭 Yayati Coaches Group | Created with ❤️</p>
+            <p>Total Monday Reflections: <span id="footerTotal">0</span></p>
+        </footer>
+    </div>
+
+    <script>
+        let allPosts = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        // Load posts from JSON file
+        fetch('anand_posts.json')
+            .then(response => response.json())
+            .then(posts => {
+                allPosts = posts;
+                initializeFilters();
+                updateStats();
+                renderTimeline();
+            })
+            .catch(error => {
+                console.error('Error loading posts:', error);
+                document.getElementById('timeline').innerHTML = '<div class="no-results">Error loading posts. Please ensure anand_posts.json is available.</div>';
+            });
+
+        function initializeFilters() {
+            const years = [...new Set(allPosts.map(post => post.year))].sort((a, b) => b - a);
+            const yearFiltersDiv = document.getElementById('yearFilters');
+
+            years.forEach(year => {
+                const filter = document.createElement('div');
+                filter.className = 'year-filter';
+                filter.dataset.year = year;
+                filter.textContent = year;
+                filter.onclick = () => setYearFilter(year);
+                yearFiltersDiv.appendChild(filter);
+            });
+        }
+
+        function setYearFilter(year) {
+            currentFilter = year;
+            document.querySelectorAll('.year-filter').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.year == year) {
+                    el.classList.add('active');
+                }
+            });
+            renderTimeline();
+        }
+
+        function updateStats() {
+            const years = [...new Set(allPosts.map(post => post.year))].sort();
+            document.getElementById('totalPosts').textContent = allPosts.length;
+            document.getElementById('totalYears').textContent = years.length;
+            document.getElementById('firstYear').textContent = years[0];
+            document.getElementById('footerTotal').textContent = allPosts.length;
+        }
+
+        function filterPosts() {
+            let filtered = allPosts;
+
+            // Filter by year
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(post => post.year == currentFilter);
+            }
+
+            // Filter by search query
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filtered = filtered.filter(post =>
+                    post.text.toLowerCase().includes(query) ||
+                    post.date.includes(query)
+                );
+            }
+
+            return filtered;
+        }
+
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            const noResults = document.getElementById('noResults');
+            const filtered = filterPosts();
+
+            if (filtered.length === 0) {
+                timeline.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            // Group by year and month
+            const grouped = {};
+            filtered.forEach(post => {
+                if (!grouped[post.year]) grouped[post.year] = {};
+                if (!grouped[post.year][post.month]) grouped[post.year][post.month] = [];
+                grouped[post.year][post.month].push(post);
+            });
+
+            let html = '';
+
+            // Sort years in descending order
+            const years = Object.keys(grouped).sort((a, b) => b - a);
+
+            years.forEach(year => {
+                const yearPosts = Object.values(grouped[year]).flat();
+                html += `
+                    <div class="year-section">
+                        <div class="year-header">
+                            <h2>${year}</h2>
+                            <span class="year-count">${yearPosts.length} post${yearPosts.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="timeline">
+                `;
+
+                // Month order
+                const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+
+                monthOrder.forEach(month => {
+                    if (grouped[year][month]) {
+                        html += `<div class="month-group">
+                                   <div class="month-label">${month}</div>`;
+
+                        grouped[year][month].forEach(post => {
+                            const text = post.text
+                                .replace(/<Media omitted>/g, '📷 [Media]')
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;');
+
+                            html += `
+                                <div class="post">
+                                    <div class="post-date">${post.date}</div>
+                                    <div class="post-content">${text}</div>
+                                    <div class="post-time">${post.time}</div>
+                                </div>
+                            `;
+                        });
+
+                        html += '</div>';
+                    }
+                });
+
+                html += '</div></div>';
+            });
+
+            timeline.innerHTML = html;
+        }
+
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderTimeline();
+        });
+    </script>
+</body>
+</html>
